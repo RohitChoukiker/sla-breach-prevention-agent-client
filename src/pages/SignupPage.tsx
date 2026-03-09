@@ -43,9 +43,7 @@ export default function SignupPage() {
       >
         <div className="glass-card p-8 shadow-xl">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl gradient-bg">
-              <Shield className="h-7 w-7 text-primary-foreground" />
-            </div>
+           
             <h1 className="text-2xl font-bold text-foreground">Create account</h1>
             <p className="mt-1 text-sm text-muted-foreground">Get started with SLA Shield</p>
           </div>
