@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Activity, AlertTriangle, TrendingUp, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Hero = () => (
   <section className="relative overflow-hidden bg-gradient-bg py-20 sm:py-28 lg:py-36">
@@ -27,8 +28,10 @@ const Hero = () => (
             SLA Sentinel uses AI, vector search, and LLM reasoning to predict SLA risks and trigger proactive escalation before incidents impact customers.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
-            <Button variant="hero" size="xl">
-             Login <ArrowRight className="ml-1 h-5 w-5" />
+            <Button asChild variant="hero" size="xl">
+              <Link to="/login">
+                Login <ArrowRight className="ml-1 h-5 w-5" />
+              </Link>
             </Button>
           
           </div>

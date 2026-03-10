@@ -41,7 +41,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/landing');
   };
 
   return (

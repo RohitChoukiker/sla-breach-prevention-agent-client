@@ -103,12 +103,7 @@ export default function LoginPage() {
             <Link to="/signup" className="font-medium text-primary hover:underline">Sign up</Link>
           </p>
 
-          <div className="mt-6 rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
-            <p className="font-medium mb-1">Demo accounts:</p>
-            <p>admin@demo.com / admin123</p>
-            <p>agent@demo.com / agent123</p>
-            <p>customer@demo.com / customer123</p>
-          </div>
+         
         </div>
       </motion.div>
     </div>
