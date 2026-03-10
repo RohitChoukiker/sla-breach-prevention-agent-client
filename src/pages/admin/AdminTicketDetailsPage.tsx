@@ -1,25 +1,25 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { AlertCircle, ArrowLeft, AlertTriangle, Brain, RefreshCw, Target } from 'lucide-react';
-import { PriorityBadge, StatusBadge } from '@/components/StatusBadges';
+import { AlertCircle, ArrowLeft, AlertTriangle, Brain, RefreshCw, ShieldAlert, Target } from 'lucide-react';
+import { PriorityBadge, RiskBar, StatusBadge } from '@/components/StatusBadges';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { agentApi, ticketApi, type MyTicketResponse } from '@/services/api';
+import { adminApi, type AdminUserResponse, type MyTicketResponse } from '@/services/api';
 
-interface TicketDetailViewModel {
+interface AdminTicketViewModel {
   id: string;
   title: string;
   description: string;
   priority: string;
+  priorityCode: string;
   status: string;
   riskPercentage: number;
   confidencePercentage: number | null;
-  aiPriorityLabel: string;
   processingStatus: string;
   urgency: string;
-  assignedAgentLabel: string;
   customerId: string;
+  assignedAgentId: string | null;
+  assignedAgentName: string;
   tenantLabel: string;
 }
 
@@ -75,10 +75,6 @@ function toPercentage(value: number | null) {
   return Math.max(0, Math.min(100, Math.round(value * 100)));
 }
 
-function toRiskPercentage(value: number | null) {
-  return toPercentage(value) ?? 0;
-}
-
 function getPriorityCode(priorityFinal: string | null, normalizedPriority: string) {
   if (priorityFinal && /^p\d+$/i.test(priorityFinal.trim())) {
     return priorityFinal.trim().toUpperCase();
@@ -90,67 +86,46 @@ function getPriorityCode(priorityFinal: string | null, normalizedPriority: strin
   return 'P4';
 }
 
-function mapTicket(ticket: MyTicketResponse): TicketDetailViewModel {
-  const priority = normalizePriority(ticket.priority_final, ticket.urgency_requested);
+function getAgentLabel(agentId: string | null, agents: AdminUserResponse[] = []) {
+  if (!agentId) {
+    return 'Unassigned';
+  }
 
+  const agent = agents.find((item) => item.id === agentId);
+  return agent?.name || agentId;
+}
+
+function mapTicket(ticket: MyTicketResponse, agents: AdminUserResponse[] = []): AdminTicketViewModel {
+  const priority = normalizePriority(ticket.priority_final, ticket.urgency_requested);
   return {
     id: ticket.id,
     title: ticket.title,
     description: ticket.description,
     priority,
+    priorityCode: getPriorityCode(ticket.priority_final, priority),
     status: normalizeStatus(ticket.status),
-    riskPercentage: toRiskPercentage(ticket.breach_probability),
+    riskPercentage: toPercentage(ticket.breach_probability) ?? 0,
     confidencePercentage: toPercentage(ticket.confidence_score),
-    aiPriorityLabel: getPriorityCode(ticket.priority_final, priority),
     processingStatus: toTitleCase(ticket.processing_status),
     urgency: toTitleCase(ticket.urgency_requested),
-    assignedAgentLabel: ticket.assigned_agent_id ? ticket.assigned_agent_id : 'Unassigned',
     customerId: ticket.customer_id,
+    assignedAgentId: ticket.assigned_agent_id,
+    assignedAgentName: getAgentLabel(ticket.assigned_agent_id, agents),
     tenantLabel: ticket.tenant_id || 'Not linked',
   };
 }
 
-export default function TicketDetailsPage() {
+export default function AdminTicketDetailsPage() {
   const { ticketId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [ticket, setTicket] = useState<TicketDetailViewModel | null>(null);
+  const [ticket, setTicket] = useState<AdminTicketViewModel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const isAgentRoute = location.pathname.startsWith('/agent/');
 
-  const fetchTicket = async (id: string) => {
-    return isAgentRoute ? agentApi.getTicket(id) : ticketApi.getTicket(id);
-  };
-
-  useEffect(() => {
-    const loadTicket = async () => {
-      if (!ticketId) {
-        setError('Ticket not found');
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const response = await fetchTicket(ticketId);
-        setTicket(mapTicket(response.data));
-      } catch (err: any) {
-        const fallbackMessage = 'Unable to load ticket details right now.';
-        const message = err?.response?.data?.detail || err?.message || fallbackMessage;
-        setError(message || fallbackMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void loadTicket();
-  }, [ticketId, isAgentRoute]);
-
-  const refreshTicket = async () => {
+  const loadTicket = async () => {
     if (!ticketId) {
+      setError('Ticket not found');
+      setIsLoading(false);
       return;
     }
 
@@ -158,20 +133,26 @@ export default function TicketDetailsPage() {
     setError(null);
 
     try {
-      const response = await fetchTicket(ticketId);
-      setTicket(mapTicket(response.data));
+      const [ticketResponse, usersResponse] = await Promise.all([
+        adminApi.getTicket(ticketId),
+        adminApi.getAllUsers(),
+      ]);
+      const agentUsers = usersResponse.data.filter((user) => user.role === 'agent');
+      setTicket(mapTicket(ticketResponse.data, agentUsers));
     } catch (err: any) {
-      const fallbackMessage = 'Unable to load ticket details right now.';
-      const message = err?.response?.data?.detail || err?.message || fallbackMessage;
-      setError(message || fallbackMessage);
+      setError(err?.response?.data?.detail || err?.message || 'Unable to load ticket details');
     } finally {
       setIsLoading(false);
     }
   };
 
+  useEffect(() => {
+    void loadTicket();
+  }, [ticketId]);
+
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="mx-auto max-w-5xl space-y-6">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>
@@ -179,7 +160,7 @@ export default function TicketDetailsPage() {
           <div className="h-40 animate-pulse rounded-3xl bg-muted/50" />
           <div className="grid gap-4 sm:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="h-40 animate-pulse rounded-3xl bg-muted/50" />
+              <div key={index} className="h-36 animate-pulse rounded-3xl bg-muted/50" />
             ))}
           </div>
         </div>
@@ -189,7 +170,7 @@ export default function TicketDetailsPage() {
 
   if (error || !ticket) {
     return (
-      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="mx-auto max-w-5xl space-y-6">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>
@@ -201,7 +182,7 @@ export default function TicketDetailsPage() {
             <h1 className="text-xl font-semibold text-foreground">Ticket not available</h1>
             <p className="mt-2 text-sm text-muted-foreground">{error || 'The requested ticket could not be found.'}</p>
           </div>
-          <Button onClick={() => void refreshTicket()}>
+          <Button onClick={() => void loadTicket()}>
             <RefreshCw className="mr-2 h-4 w-4" /> Retry
           </Button>
         </div>
@@ -209,88 +190,94 @@ export default function TicketDetailsPage() {
     );
   }
 
-  const riskColor = ticket.riskPercentage >= 80 ? 'text-destructive' : ticket.riskPercentage >= 60 ? 'text-warning' : 'text-success';
-  const riskBg = ticket.riskPercentage >= 80 ? 'bg-destructive' : ticket.riskPercentage >= 60 ? 'bg-warning' : 'bg-success';
-
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 w-full sm:w-auto">
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>
-        <Button variant="outline" onClick={() => void refreshTicket()} className="w-full sm:w-auto">
+        <Button variant="outline" onClick={() => void loadTicket()} className="w-full sm:w-auto">
           <RefreshCw className="mr-2 h-4 w-4" /> Refresh Details
         </Button>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-        {/* Header */}
         <div className="glass-card p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-sm font-mono text-muted-foreground">{ticket.id}</p>
-              <h1 className="mt-1 text-xl font-bold text-foreground">{ticket.title}</h1>
-              <p className="mt-2 text-muted-foreground">{ticket.description}</p>
+              <h1 className="mt-1 text-2xl font-bold text-foreground">{ticket.title}</h1>
+              <p className="mt-2 max-w-3xl text-muted-foreground">{ticket.description}</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <PriorityBadge priority={ticket.priority} />
               <StatusBadge status={ticket.status} />
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-            <div>
-              <span className="text-muted-foreground">Customer ID</span>
-              <p className="font-medium text-foreground break-all">{ticket.customerId}</p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+            <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+              <p className="text-muted-foreground">Customer ID</p>
+              <p className="mt-1 break-all font-medium text-foreground">{ticket.customerId}</p>
             </div>
-            <div>
-              <span className="text-muted-foreground">Assigned Agent</span>
-              <p className="font-medium text-foreground break-all">{ticket.assignedAgentLabel}</p>
+            <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+              <p className="text-muted-foreground">Assigned Agent</p>
+              <p className="mt-1 break-all font-medium text-foreground">{ticket.assignedAgentName}</p>
             </div>
-            <div>
-              <span className="text-muted-foreground">Urgency</span>
-              <p className="font-medium text-foreground">{ticket.urgency}</p>
+            <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+              <p className="text-muted-foreground">Urgency</p>
+              <p className="mt-1 font-medium text-foreground">{ticket.urgency}</p>
             </div>
-            <div>
-              <span className="text-muted-foreground">Processing</span>
-              <p className="font-medium text-foreground">{ticket.processingStatus}</p>
+            <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+              <p className="text-muted-foreground">Processing</p>
+              <p className="mt-1 font-medium text-foreground">{ticket.processingStatus}</p>
             </div>
-          </div>
-          <div className="mt-4 rounded-2xl border border-border/60 bg-background/40 p-4 text-sm">
-            <span className="text-muted-foreground">Tenant</span>
-            <p className="mt-1 font-medium text-foreground break-all">{ticket.tenantLabel}</p>
           </div>
         </div>
 
-        {/* AI Insights */}
         <div className="grid gap-4 sm:grid-cols-3">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-6 text-center">
-            <AlertTriangle className={cn('mx-auto h-8 w-8 mb-2', riskColor)} />
+            <AlertTriangle className="mx-auto mb-2 h-8 w-8 text-destructive" />
             <p className="text-sm text-muted-foreground">Breach Probability</p>
-            <p className={cn('text-3xl font-bold mt-1', riskColor)}>{ticket.riskPercentage}%</p>
-            <div className="mt-3 h-2 w-full rounded-full bg-muted">
-              <div className={cn('h-full rounded-full transition-all duration-700', riskBg)} style={{ width: `${ticket.riskPercentage}%` }} />
+            <p className="mt-1 text-3xl font-bold text-foreground">{ticket.riskPercentage}%</p>
+            <div className="mt-3 flex justify-center">
+              <RiskBar percentage={ticket.riskPercentage} />
             </div>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-6 text-center">
-            <Brain className="mx-auto h-8 w-8 mb-2 text-primary" />
+            <Brain className="mx-auto mb-2 h-8 w-8 text-primary" />
             <p className="text-sm text-muted-foreground">Confidence Score</p>
-            <p className="text-3xl font-bold mt-1 text-primary">
+            <p className="mt-1 text-3xl font-bold text-primary">
               {ticket.confidencePercentage == null ? 'Pending' : `${ticket.confidencePercentage}%`}
             </p>
-            <div className="mt-3 h-2 w-full rounded-full bg-muted">
-              <div className="h-full rounded-full bg-primary transition-all duration-700" style={{ width: `${ticket.confidencePercentage ?? 0}%` }} />
-            </div>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-6 text-center">
-            <Target className="mx-auto h-8 w-8 mb-2 text-foreground" />
-            <p className="text-sm text-muted-foreground">AI Priority</p>
-            <p className="text-3xl font-bold mt-1 text-foreground">{ticket.aiPriorityLabel}</p>
-            <div className="mt-3">
+            <Target className="mx-auto mb-2 h-8 w-8 text-foreground" />
+            <p className="text-sm text-muted-foreground">Final Priority</p>
+            <p className="mt-1 text-3xl font-bold text-foreground">{ticket.priorityCode}</p>
+            <div className="mt-3 flex justify-center">
               <PriorityBadge priority={ticket.priority} />
             </div>
           </motion.div>
+        </div>
+
+        <div className="glass-card p-6">
+          <div className="flex items-center gap-3">
+            <ShieldAlert className="h-5 w-5 text-warning" />
+            <h2 className="text-lg font-semibold text-foreground">Admin Overview</h2>
+          </div>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 text-sm">
+            <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+              <p className="text-muted-foreground">Tenant</p>
+              <p className="mt-1 break-all font-medium text-foreground">{ticket.tenantLabel}</p>
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+              <p className="text-muted-foreground">Current Status</p>
+              <p className="mt-1 font-medium text-foreground">{ticket.status}</p>
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>

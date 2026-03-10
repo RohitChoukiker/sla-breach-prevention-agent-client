@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  LayoutDashboard, Ticket, AlertTriangle, Users, BarChart3,
-  ScrollText, Settings, ChevronLeft, Search, Bell, LogOut,
+  Ticket, AlertTriangle, Users, BarChart3,
+  ScrollText, ChevronLeft, LogOut,
   Menu, X, Shield, UserCircle
 } from 'lucide-react';
 import { useAuth, UserRole } from '@/context/auth-context';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -19,16 +18,13 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard', icon: LayoutDashboard, path: '', roles: ['customer', 'agent', 'admin'] },
   { label: 'Create Ticket', icon: Ticket, path: '/create-ticket', roles: ['customer'] },
   { label: 'My Tickets', icon: ScrollText, path: '/my-tickets', roles: ['customer'] },
   { label: 'Assigned Tickets', icon: Ticket, path: '/assigned-tickets', roles: ['agent'] },
+  { label: 'Analytics', icon: BarChart3, path: '/analytics', roles: ['admin'] },
   { label: 'Tickets', icon: Ticket, path: '/tickets', roles: ['admin'] },
   { label: 'High Risk Monitor', icon: AlertTriangle, path: '/high-risk', roles: ['admin'] },
   { label: 'Users', icon: Users, path: '/users', roles: ['admin'] },
-  { label: 'Analytics', icon: BarChart3, path: '/analytics', roles: ['admin'] },
-  { label: 'Audit Logs', icon: ScrollText, path: '/audit-logs', roles: ['admin'] },
-  { label: 'Settings', icon: Settings, path: '/settings', roles: ['customer', 'agent', 'admin'] },
 ];
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -39,6 +35,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   const role = user?.role || 'customer';
+  const showSidebar = role !== 'agent';
   const basePath = `/${role}`;
   const filteredItems = navItems.filter(item => item.roles.includes(role));
 
@@ -51,7 +48,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Mobile overlay */}
       <AnimatePresence>
-        {mobileOpen && (
+        {showSidebar && mobileOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -63,7 +60,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <motion.aside
+      {showSidebar && <motion.aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card lg:relative',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -81,7 +78,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 exit={{ opacity: 0 }}
                 className="flex items-center gap-2"
               >
-                <Shield className="h-7 w-7 text-primary" />
+                <img src="/icon.png" alt="Logo" className="h-6 w-6" />
                 <span className="text-lg font-bold gradient-text">SLA Shield</span>
               </motion.div>
             )}
@@ -157,7 +154,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             )}
           </div>
         </div>
-      </motion.aside>
+      </motion.aside>}
 
       {/* Main */}
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -168,28 +165,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               variant="ghost"
               size="icon"
               onClick={() => setMobileOpen(true)}
-              className="lg:hidden"
+              className={cn('lg:hidden', !showSidebar && 'hidden')}
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                className="w-64 pl-9 rounded-xl border-border bg-muted/50"
-              />
-            </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                3
-              </span>
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
-              <LogOut className="h-5 w-5" />
+            <Button variant="outline" onClick={handleLogout} className="rounded-xl">
+              <LogOut className="mr-2 h-4 w-4" /> Logout
             </Button>
           </div>
         </header>

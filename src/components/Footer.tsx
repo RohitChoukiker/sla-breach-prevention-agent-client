@@ -14,8 +14,10 @@ const Footer = () => (
         <div className="lg:col-span-1 flex flex-col justify-between h-full">
           <div>
             <div className="flex items-center gap-2">
-              <Shield className="h-6 w-6 text-accent" />
-              <span className="text-lg font-bold" style={{ fontFamily: "var(--font-display)" }}>SLA Sentinel</span>
+                      <img src="/icon.png" alt="SLA Sentinel Logo" className="h-8 w-8" />
+              <span className="text-lg font-bold" style={{ fontFamily: "var(--font-display)" }}>
+                <span style={{ color: '#FFC107' }}>SLA</span> Sentinel
+              </span>
             </div>
             <p className="mt-3 text-sm text-muted-foreground">AI-Powered SLA Breach Prevention Platform</p>
           </div>

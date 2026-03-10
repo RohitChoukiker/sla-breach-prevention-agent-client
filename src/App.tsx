@@ -11,23 +11,19 @@ import NotFound from "@/pages/NotFound";
 import LandingPage from "@/pages/LandingPage";
 
 // Customer pages
-import CustomerDashboard from "@/pages/customer/CustomerDashboard";
 import CreateTicketPage from "@/pages/customer/CreateTicketPage";
 import MyTicketsPage from "@/pages/customer/MyTicketsPage";
 import TicketDetailsPage from "@/pages/customer/TicketDetailsPage";
 
 // Agent pages
-import AgentDashboard from "@/pages/agent/AgentDashboard";
 import AssignedTicketsPage from "@/pages/agent/AssignedTicketsPage";
 
 // Admin pages
-import AdminDashboard from "@/pages/admin/AdminDashboard";
 import UserManagementPage from "@/pages/admin/UserManagementPage";
 import AdminTicketsPage from "@/pages/admin/AdminTicketsPage";
+import AdminTicketDetailsPage from "./pages/admin/AdminTicketDetailsPage";
 import HighRiskMonitorPage from "@/pages/admin/HighRiskMonitorPage";
 import AnalyticsPage from "@/pages/admin/AnalyticsPage";
-import AuditLogsPage from "@/pages/admin/AuditLogsPage";
-import SettingsPage from "@/pages/SettingsPage";
 
 const queryClient = new QueryClient();
 
@@ -53,27 +49,23 @@ function AppRoutes() {
       <Route path="/signup" element={<SignupPage />} />
 
       {/* Customer */}
-      <Route path="/customer" element={<ProtectedRoute><CustomerDashboard /></ProtectedRoute>} />
+      <Route path="/customer" element={<Navigate to="/customer/my-tickets" replace />} />
       <Route path="/customer/create-ticket" element={<ProtectedRoute><CreateTicketPage /></ProtectedRoute>} />
       <Route path="/customer/my-tickets" element={<ProtectedRoute><MyTicketsPage /></ProtectedRoute>} />
       <Route path="/customer/ticket/:ticketId" element={<ProtectedRoute><TicketDetailsPage /></ProtectedRoute>} />
-      <Route path="/customer/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
       {/* Agent */}
-      <Route path="/agent" element={<ProtectedRoute><AgentDashboard /></ProtectedRoute>} />
+      <Route path="/agent" element={<Navigate to="/agent/assigned-tickets" replace />} />
       <Route path="/agent/assigned-tickets" element={<ProtectedRoute><AssignedTicketsPage /></ProtectedRoute>} />
       <Route path="/agent/ticket/:ticketId" element={<ProtectedRoute><TicketDetailsPage /></ProtectedRoute>} />
-      <Route path="/agent/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
 
       {/* Admin */}
-      <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin" element={<Navigate to="/admin/analytics" replace />} />
       <Route path="/admin/tickets" element={<ProtectedRoute><AdminTicketsPage /></ProtectedRoute>} />
       <Route path="/admin/high-risk" element={<ProtectedRoute><HighRiskMonitorPage /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute><UserManagementPage /></ProtectedRoute>} />
       <Route path="/admin/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
-      <Route path="/admin/audit-logs" element={<ProtectedRoute><AuditLogsPage /></ProtectedRoute>} />
-      <Route path="/admin/ticket/:ticketId" element={<ProtectedRoute><TicketDetailsPage /></ProtectedRoute>} />
-      <Route path="/admin/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+      <Route path="/admin/ticket/:ticketId" element={<ProtectedRoute><AdminTicketDetailsPage /></ProtectedRoute>} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
