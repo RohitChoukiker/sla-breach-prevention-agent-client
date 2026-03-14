@@ -196,11 +196,11 @@ PostgreSQL
 
 ---
 
-# 🛠 Local Development Setup
+#  Local Development Setup
 
 Clone the repository
 
-git clone https://github.com/your-repo-link
+git clone repo
 
 Navigate to project directory
 
