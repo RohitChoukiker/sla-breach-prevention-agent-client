@@ -1,73 +1,244 @@
-# Welcome to your Lovable project
 
-## Project info
+#  AI SLA Breach Prevention Platform
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+An intelligent AI-powered platform that predicts and prevents SLA (Service Level Agreement) violations in real-time support ticketing systems.
 
-## How can I edit this code?
+The system uses **LLM reasoning, vector similarity search, and hybrid risk scoring** to proactively identify high-risk tickets before they breach their SLA deadlines.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+#  GitHub Repositories
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Frontend Repository  
+https://github.com/RohitChoukiker/sla-breach-prevention-agent-client.git
 
-Changes made via Lovable will be committed automatically to this repo.
+Backend Repository  
+https://github.com/RohitChoukiker/sla-breach-prevention-agent
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+#  Project Overview
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Support teams often struggle to identify tickets that may violate SLA deadlines before it is too late.
 
-Follow these steps:
+This platform introduces an **AI-driven SLA breach prevention engine** that analyzes incoming tickets using embeddings, vector search, and LLM reasoning.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Instead of reacting to breaches, the system **predicts them early and triggers preventive escalation workflows**.
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Key capabilities:
 
-# Step 3: Install the necessary dependencies.
-npm i
+• AI-based breach prediction  
+• Vector similarity analysis  
+• LLM reasoning for risk estimation  
+• Hybrid risk scoring  
+• Automated escalation workflows  
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+---
+
+#  System Architecture
+
+Frontend
+• React
+• TypeScript
+• TailwindCSS
+• ShadCN UI
+
+Backend
+• FastAPI
+
+AI Engine
+• LangGraph workflow orchestration
+• Sentence Transformers embeddings
+
+LLM
+• Gemini
+
+Vector Database
+• Pinecone
+
+Queue System
+• Redis
+• RQ Workers
+
+Database
+• PostgreSQL
+
+---
+
+#  AI Risk Prediction Engine
+
+The core of the system is the **AI Risk Engine**, responsible for predicting SLA breach probability.
+
+Pipeline:
+
+Ticket Created  
+↓  
+Embedding Generated (SentenceTransformer)  
+↓  
+Vector Stored in Pinecone  
+↓  
+Similar Historical Tickets Retrieved  
+↓  
+Gemini LLM Evaluates Context  
+↓  
+Hybrid Risk Score Calculated  
+↓  
+Escalation Decision Triggered  
+
+This hybrid approach improves accuracy by combining:
+
+• Semantic similarity  
+• Historical ticket outcomes  
+• LLM contextual reasoning  
+
+---
+
+#  System Workflow
+
+1. Customer creates a ticket.
+2. Ticket is pushed into a Redis queue.
+3. RQ worker processes the ticket asynchronously.
+4. Ticket description is converted into a vector embedding.
+5. Embedding is stored in Pinecone vector database.
+6. Similar historical tickets are retrieved using vector search.
+7. Gemini LLM analyzes ticket severity and predicts SLA breach probability.
+8. Hybrid scoring algorithm calculates final risk score.
+9. If risk exceeds threshold:
+   - Escalation email sent
+   - Ticket priority increased
+   - Admin notified
+10. Ticket state updated in PostgreSQL.
+
+---
+
+#  System Roles
+
+Customer
+
+• Create support tickets  
+• Track ticket status  
+• Monitor SLA breach risk  
+
+Agent
+
+• View assigned tickets  
+• Update ticket status  
+• Resolve support issues  
+
+Admin
+
+• Manage users  
+• Assign agents to tickets  
+• Monitor high-risk tickets  
+• Override AI decisions  
+• View analytics and audit logs  
+
+---
+
+#  Core Features
+
+ AI-powered SLA breach prediction
+
+ Vector similarity search with Pinecone
+
+ Hybrid risk scoring system
+
+ Automated escalation workflows
+
+ Email alerts for high-risk tickets
+
+ Admin monitoring dashboard
+
+ Role-based authentication system
+
+ Audit logs for administrative actions
+
+---
+
+#  Frontend Dashboard Modules
+
+Customer Dashboard
+
+• Ticket creation interface  
+• Ticket monitoring  
+• SLA risk visibility  
+
+Agent Dashboard
+
+• Assigned ticket list  
+• Ticket resolution workflow  
+
+Admin Dashboard
+
+• System monitoring overview  
+• User management  
+• High-risk ticket tracking  
+• Analytics and audit logs  
+
+---
+
+# Deployment
+
+Frontend  
+Deployed on Vercel
+
+Backend  
+Deployed on cloud server
+
+Vector Database  
+Pinecone
+
+Queue System  
+Redis + RQ Workers
+
+Database  
+PostgreSQL
+
+---
+
+# 🛠 Local Development Setup
+
+Clone the repository
+
+git clone https://github.com/your-repo-link
+
+Navigate to project directory
+
+cd project
+
+Install backend dependencies
+
+pip install -r requirements.txt
+
+Run backend server
+
+uvicorn main:app --reload
+
+Install frontend dependencies
+
+cd frontend
+npm install
+
+Run frontend
+
 npm run dev
-```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+# Future Improvements
 
-**Use GitHub Codespaces**
+• AI-based ticket auto-classification  
+• SLA breach explanation using LLM reasoning  
+• Predictive analytics dashboard  
+• Slack / Teams integration  
+• Multi-tenant enterprise support  
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+#  Author
 
-This project is built with:
+Rohit Choukiker
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+AI Engineer | Full Stack Developer
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
