@@ -1,13 +1,37 @@
 import { motion } from "framer-motion";
-import { Brain, Search, Zap, Activity, ShieldCheck, FileText } from "lucide-react";
+import { Brain, Search, Cpu, Zap, Activity, ShieldCheck, FileText } from "lucide-react";
 
 const features = [
-  { icon: Brain, title: "AI Risk Prediction", desc: "Predict SLA breaches using LLM reasoning." },
-  { icon: Search, title: "Vector Search Intelligence", desc: "Retrieve similar historical incidents using semantic search." },
-  { icon: Zap, title: "Automated Escalation", desc: "Automatically escalate high-risk tickets." },
-  { icon: Activity, title: "Real-time Monitoring", desc: "Track ticket risk in real time." },
-  { icon: ShieldCheck, title: "Admin Control", desc: "Admins can override AI decisions." },
-  { icon: FileText, title: "Audit Logging", desc: "Track AI decision history." },
+  { 
+    icon: Brain, 
+    title: "AI Risk Prediction", 
+    desc: "Predict SLA breaches using LLM reasoning." 
+  },
+  { 
+    icon: Search, 
+    title: "Vector Search Intelligence", 
+    desc: "Retrieve similar historical incidents using semantic search." 
+  },
+  { 
+    icon: Cpu, 
+    title: "ML Breach Prediction", 
+    desc: "Machine learning model analyzes urgency and historical patterns to predict SLA breach probability." 
+  },
+  { 
+    icon: Zap, 
+    title: "Automated Escalation", 
+    desc: "Automatically escalate high-risk tickets." 
+  },
+  { 
+    icon: Activity, 
+    title: "Real-time Monitoring", 
+    desc: "Track ticket risk in real time." 
+  },
+  { 
+    icon: ShieldCheck, 
+    title: "Admin Control", 
+    desc: "Admins can override AI decisions." 
+  }
 ];
 
 const Features = () => (

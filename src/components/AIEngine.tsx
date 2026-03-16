@@ -1,13 +1,43 @@
 import { motion } from "framer-motion";
-import { Cpu, MessageSquare, Database, Code2, ArrowRight, AlertTriangle, BarChart3 } from "lucide-react";
+import { Cpu,Brain, MessageSquare, Database, Code2, ArrowRight, AlertTriangle, BarChart3 } from "lucide-react";
 
 const blocks = [
-  { icon: Cpu, title: "LangGraph", desc: "Orchestration engine for multi-step AI workflows" },
-  { icon: MessageSquare, title: "Gemini LLM", desc: "Advanced reasoning for risk assessment" },
-  { icon: Code2, title: "SentenceTransformer", desc: "Embedding model for ticket similarity" },
-  { icon: Database, title: "Pinecone", desc: "Vector database for semantic incident search" },
-  { icon: BarChart3, title: "Risk Engine", desc: "AI calculates SLA breach probability using historical patterns" },
-  { icon: AlertTriangle, title: "SLA Breach Alerts", desc: "Proactive alerts and recommendations before violations occur", highlight: true },
+  { 
+    icon: Cpu, 
+    title: "LangGraph", 
+    desc: "Orchestration engine for multi-step AI workflows" 
+  },
+  { 
+    icon: MessageSquare, 
+    title: "Gemini LLM", 
+    desc: "Advanced reasoning for risk assessment" 
+  },
+  { 
+    icon: Code2, 
+    title: "SentenceTransformer", 
+    desc: "Embedding model for ticket similarity" 
+  },
+  { 
+    icon: Database, 
+    title: "Pinecone", 
+    desc: "Vector database for semantic incident search" 
+  },
+  { 
+    icon: Brain, 
+    title: "ML Prediction Model", 
+    desc: "Machine learning model predicts SLA breach probability using ticket urgency and historical patterns" 
+  },
+  { 
+    icon: BarChart3, 
+    title: "Risk Engine", 
+    desc: "Hybrid scoring combining ML predictions and rule-based signals" 
+  },
+  { 
+    icon: AlertTriangle, 
+    title: "SLA Breach Alerts", 
+    desc: "Proactive alerts and recommendations before violations occur",
+    highlight: true 
+  }
 ];
 
 const AIEngine = () => (

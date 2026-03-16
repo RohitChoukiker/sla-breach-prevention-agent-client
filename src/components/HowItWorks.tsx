@@ -3,9 +3,9 @@ import { Ticket, Brain, Search, BarChart3, AlertTriangle, Bell } from "lucide-re
 
 const steps = [
   { icon: Ticket, label: "Ticket Created" },
-  { icon: Brain, label: "AI Risk Prediction" },
+  { icon: Brain, label: "AI Processing" },
   { icon: Search, label: "Vector Retrieval" },
-  { icon: BarChart3, label: "Hybrid Scoring" },
+  { icon: BarChart3, label: "Hybrid ML Scoring" },
   { icon: AlertTriangle, label: "Escalation Trigger" },
   { icon: Bell, label: "Notification Sent" },
 ];
