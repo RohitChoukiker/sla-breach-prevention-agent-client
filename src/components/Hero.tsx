@@ -36,7 +36,7 @@ const Hero = () => (
           <p className="mt-6 max-w-3xl text-lg leading-relaxed text-muted-foreground">
             SLA Sentinel combines <strong>LLM reasoning</strong>, 
             <strong> vector similarity search</strong>, and a 
-            <strong> machine learning prediction engine</strong> 
+            <strong> machine learning prediction engine </strong> 
             to detect SLA risks early and trigger proactive escalation 
             before incidents impact customers.
           </p>
